@@ -1,7 +1,16 @@
 import React from 'react'
 import "./Sidebar.css"
 
-const Sidebar = ({ onAddNote, notes, onDeleteNote, activeNote, setActiveNote }) => {
+const Sidebar = ({
+  onAddNote,
+  notes,
+  onDeleteNote,
+  activeNote,
+  setActiveNote
+}) => {
+
+  const sortedNotes = notes.sort((a, b) => b.modDate - a.modDate)
+
   return (
     <div className='app-sidebar'>
       <div className="app-sidebar-header">
@@ -10,13 +19,15 @@ const Sidebar = ({ onAddNote, notes, onDeleteNote, activeNote, setActiveNote }) 
       </div>
       <div className="app-sidebar-notes">
         {/* map関数でnoteの要素を取り出してやる */}
-        {notes.map((note) => (
+        {sortedNotes.map((note) => (
           <div 
             className={`app-sidebar-note ${note.id === activeNote && "active"}`}
             key={note.id}
             onClick={() => setActiveNote(note.id)}>
             <div className="sidebar-note-title">
-              <strong>{note.title}</strong>
+              <strong>
+                {note.title}
+              </strong>
               {/* 押したときはアロー関数で記述する(引数を取る場合)*/}
               <button onClick={() => onDeleteNote(note.id)}>削除</button>
             </div>

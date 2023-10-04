@@ -1,19 +1,30 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import Main from './components/Main/Main'
 import Sidebar from './components/Sidebar/Sidebar'
 import uuid from "react-uuid"
 
 function App() {
-  const [notes, setNotes] = useState([])
+  const [notes, setNotes] = useState(JSON.parse(localStorage.getItem("notes")) || [])
   const [activeNote, setActiveNote] = useState(false)
+
+  useEffect(() => {
+    // ローカルストレージにノートを保存する
+    localStorage.setItem("notes", JSON.stringify(notes))
+  }, [notes])
+
+  useEffect(() => {
+    // リロードした時、1番目のノートが選択されるようにする
+    setActiveNote(notes[0].id)
+  }, [notes])
+
   const onAddNote = () => {
     console.log("新しくノートが追加されました");
     const newNote = {
       // ランダムなidを設定
       id: uuid(),
-      title:"新しいノート",
-      text:"新しいノートの内容",
+      title:"Title",
+      text:"",
       modDate: Date.now(),
     };
     // ...（スプレット構文）で書かないと２つ目以降の要素が追加されない
@@ -27,6 +38,21 @@ function App() {
     setNotes(filterNotes)
   }
 
+  const getActiveNote = () => {
+    return notes.find((note) => note.id === activeNote);
+  }
+
+  const onUpdateNote = (updatedNote) => {
+    // 修正されたノートの配列を返す
+    const updatedNotesArray = notes.map((note) => {
+      if(note.id === updatedNote.id) {
+        return updatedNote
+      } else {
+        return note
+      }
+    })
+    setNotes(updatedNotesArray)
+  }
   return (
     <>
       <div className="App">
@@ -37,7 +63,7 @@ function App() {
           activeNote={activeNote}
           setActiveNote={setActiveNote}
         />
-        <Main/>
+        <Main activeNote={getActiveNote()} onUpdateNote={onUpdateNote}/>
       </div>
     </>
   )
